@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Maud plug-ins" default="deploy" basedir=".">
+    <description>
+        Maud plugin compile and deployment (modify the my_plugin name for your purpose)
+    </description>
+    
+    <property name="package.name" value="my_plugin"/>
+    <property name="package.version" value="1.0"/>
+
+    <!-- Set default properties for this build -->
+    <property name="base.dir" location="${basedir}"/>
+    <property name="src.dir" location="${base.dir}/src"/>
+    
+    <!-- Generated directories -->
+    <property name="build.dir" location="${base.dir}/build"/>
+    <property name="deploy.dir" location="${base.dir}/../plugins"/>
+
+    <fileset id="resources.files"
+        dir="${src.dir}">
+        <include name="resources/**"/>
+    </fileset>
+    
+    <fileset id="html.files"
+        dir="${src.dir}">
+        <include name="**/*.html"/>
+    </fileset>    
+
+    <fileset id="xml.files"
+        dir="${src.dir}">    
+        <include name="**/*.xml"/>
+    </fileset>
+    
+    <fileset id="lib.files" 
+        dir="${basedir}/..">
+        <include name="Maud.jar"/>
+        <include name="lib/*.jar"/>
+        <include name="Maud.app/Contents/Resources/Java/*.jar"/>
+    </fileset>    
+
+    <fileset id="images.files" 
+        dir="${src.dir}">
+        <include name="images/*.jpg"/>
+    </fileset>    
+
+    <path id="compile.classpath">
+        <fileset refid="lib.files"/>
+    </path>
+    
+    <target name="deploy" depends="compile"
+        description="Create plugin JAR">    
+        <jar destfile="${deploy.dir}/${package.name}.jar"
+            basedir="${build.dir}"
+            compress="true">            
+            <include name="**"/>
+        </jar>
+    </target>
+    
+    <target name="compile"
+        depends="init"
+        description="Compile all examples">
+        <javac
+            srcdir="${src.dir}"
+            destdir="${build.dir}"
+            debug="on"
+            target="1.4"
+            source="1.4">
+            <classpath refid="compile.classpath"/>
+        </javac>
+
+        <copy todir="${build.dir}" overwrite="true">
+            <fileset refid="resources.files"/>
+        </copy>
+
+        <copy todir="${build.dir}" overwrite="true">
+            <fileset refid="html.files"/>
+            <fileset refid="xml.files"/>
+            <fileset refid="images.files"/>
+        </copy>
+    </target>
+    
+    <!-- ================= -->
+    <!-- Secondary targets -->
+    <!-- ================= -->
+
+    <!-- Initialize  -->
+    <target name="init"
+        depends="clean"
+        description="Create build dir at start">
+        <echo message="Building ${ant.project.name}"/>
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build.dir}"/>
+    </target>
+    
+    <target name="clean" description="Remove all files and directories created during build.">
+        <delete dir="${build.dir}"/>        
+    </target>    
+</project>   
